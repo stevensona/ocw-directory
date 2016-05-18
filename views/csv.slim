@@ -1,0 +1,15 @@
+table#courses.table.table-striped.table-bordered cellspacing="0" width="100%"
+  thead
+    tr
+      - @headers.each do |field|
+        th = field
+  tbody
+    - @rows.each do |row|
+      tr
+        - row.each do |field|
+          td = field
+
+javascript:
+    $(document).ready(function() {
+        $('#courses').DataTable();
+    } );
