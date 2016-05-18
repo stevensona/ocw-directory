@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    title =title
+    meta charset='utf-8'
+    link href='https://cdn.datatables.net/t/zf-5.5.2/jq-2.2.0,dt-1.10.11,r-2.0.2/datatables.min.css' rel='stylesheet' type='text/css'
+    script src='https://cdn.datatables.net/t/zf-5.5.2/jq-2.2.0,dt-1.10.11,r-2.0.2/datatables.min.js'
+
+body
+
+    section.header
+      h1.header =title
+
+    section.content
+      == yield
