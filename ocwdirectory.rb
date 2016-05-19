@@ -1,6 +1,7 @@
 require 'nokogiri'
 require 'open-uri'
 require 'active_support/core_ext/string'
+require 'csv'
 
 class TrueClass
   def yesno
@@ -20,7 +21,7 @@ courses = Hash.new
 all_features = Array.new
 count = 0
 course_list.css('table.courseList').each do |category|
-    #break if count == 3
+    #break if count == 1
     count = count + 1
 
     category.css('tbody').css('tr').each do |course|
@@ -28,15 +29,15 @@ course_list.css('table.courseList').each do |category|
 
         id = "#{fields[0].text.squish}_#{rand(1024).to_s(16)}"
         url = fields[1]['href'].squish
-        title = fields[1].text.squish.tr(',', '')
-        level = fields[2].text.squish.tr(',', '')
+        title = fields[1].text.squish
+        level = fields[2].text.squish
         features = []
 
 
         course_page = Nokogiri::HTML(open("http://ocw.mit.edu#{url}"))
-        instructor = course_page.css('p.ins').text.squish.tr(',', '')
+        instructor = course_page.css('p.ins').text.squish
         course_page.css('ul.specialfeatures').css('li').each do |feature|
-          feature_clean = feature.text.squish.downcase.tr(',', '')
+          feature_clean = feature.text.squish.downcase
           features << feature_clean
           all_features << feature_clean
         end
@@ -47,14 +48,14 @@ course_list.css('table.courseList').each do |category|
 
 end
 all_features.uniq!
-puts "id, department, title, instructor, url, level, #{all_features.join(', ')}"
-courses.each do |id, info|
-  course = "#{id}, #{info[:url].split('/').drop(2).first.titleize}, #{info[:title]}, #{info[:instructor]}, http://ocw.mit.edu#{info[:url]}, #{info[:level]}"
-
-  all_features.each do |feature|
-      has_feature = info[:features].include?(feature)
-      course << ", #{has_feature.yesno}"
+CSV.open(ARGV.shift, 'wb') do |csv|
+  csv << ['id', 'department', 'title', 'instructor', 'url', 'level'] + all_features
+  courses.each do |id, info|
+    row = [id, info[:url].split('/').drop(2).first.titleize, info[:title], info[:instructor], "<a href=\"http://ocw.mit.edu#{info[:url]}\">Course Page</a>", info[:level]]
+    all_features.each do |feature|
+        has_feature = info[:features].include?(feature)
+        row << has_feature.yesno
+    end
+    csv << row
   end
-  puts course
-
 end
