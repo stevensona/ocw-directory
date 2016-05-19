@@ -22,6 +22,7 @@ all_features = Array.new
 count = 0
 course_list.css('table.courseList').each do |category|
     #break if count == 1
+    puts count
     count = count + 1
 
     category.css('tbody').css('tr').each do |course|
